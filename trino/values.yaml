@@ -1,0 +1,68 @@
+image:
+  repository: trinodb/trino 
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart version.
+  tag: latest
+
+server:
+  workers: 2
+  node:
+    environment: production
+    dataDir: /data/trino
+    pluginDir: /usr/lib/trino/plugin
+  log:
+    trino:
+      level: INFO
+  config:
+    path: /etc/trino
+    http:
+      port: 8080
+    query:
+      maxMemory: "4GB"
+      maxMemoryPerNode: "1GB"
+  jvm:
+    maxHeapSize: "8G"
+    gcMethod:
+      type: "UseG1GC"
+      g1:
+        heapRegionSize: "32M"
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+catalogs:
+  hive: |
+    connector.name=hive-hadoop2
+    hive.metastore.uri=thrift://hive-metastore.test.svc.cluster.local:9083
+    hive.metastore.username=admin
+    hive.non-managed-table-writes-enabled=true
+    hive.s3.endpoint=http://minio.test.svc.cluster.local:9000
+    hive.s3.aws-access-key=accesskey
+    hive.s3.aws-secret-key=secretkey
+    hive.s3.path-style-access=true
+    hive.s3select-pushdown.enabled=true
+    hive.allow-drop-table=true
+    hive.compression-codec=ZSTD

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "metastore.fullname" . }}
+  labels:
+    app: {{ template "metastore.name" . }}
+    chart: {{ template "metastore.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: metastore
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "metastore.name" . }}
+      release: {{ .Release.Name }}
+      component: metastore
+  template:
+    metadata:
+      labels:
+        app: {{ template "metastore.name" . }}
+        release: {{ .Release.Name }}
+        component: metastore
+    spec:
+      volumes:
+        - name: vol-cfg-metastore
+          configMap:
+            name: cfg-metastore
+      containers:
+        - name: {{ template "metastore.fullname" . }}
+          image: {{ .Values.image.registry }}{{ .Values.image.repo }}:{{ .Values.image.tag }}
+          ports:
+            - containerPort: 9083
+          volumeMounts:
+            - name: vol-cfg-metastore
+              mountPath: /opt/hive-metastore/conf/metastore-site.xml
+              subPath: metastore-site.xml

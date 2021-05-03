@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  registry: registry
+  repo: metastore
+  tag: lastest
+
+service:
+  type: ClusterIP
+  port: 9083
+  nodePort: ""
+
+s3:
+  endpoint: http://minio.test.svc.cluster.local:9000
+  accessKey: accesskey
+  secretKey: secretkey
+  warehouseBucket: hive
+
+mysql:
+  jdbcUrl: jdbc:mysql://mariadb.test.svc.cluster.local:3306
+  user: admin
+  password: admin
+  dbName: metastore_db
