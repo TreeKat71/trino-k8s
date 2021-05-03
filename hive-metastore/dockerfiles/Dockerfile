@@ -10,6 +10,7 @@ WORKDIR /opt
 
 RUN set -ex \
     && curl -L https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz | tar zxf - \
+    && rm -rf ${HADOOP_HOME}/share/doc \
     && mkdir -p ${HIVE_HOME} \
     && curl -L https://archive.apache.org/dist/hive/hive-standalone-metastore-${METASTORE_VERSION}/hive-standalone-metastore-${METASTORE_VERSION}-bin.tar.gz \
         | tar zxf - -C ${HIVE_HOME} --strip-components 1 \
