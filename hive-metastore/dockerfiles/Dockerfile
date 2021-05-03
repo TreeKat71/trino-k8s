@@ -5,21 +5,27 @@ ENV METASTORE_VERSION=3.0.0
 ENV HADOOP_HOME=/opt/hadoop-${HADOOP_VERSION}
 ENV HIVE_HOME=/opt/hive-metastore
 ARG RDB_CONN=mysql-connector-java-8.0.19
+# common yarn client hdfs mapreduce tools
+ARG UNNECESSARY="client hdfs mapreduce tools"
 
 WORKDIR /opt
 
 RUN set -ex \
     && curl -L https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz | tar zxf - \
-    && rm -rf ${HADOOP_HOME}/share/doc \
     && mkdir -p ${HIVE_HOME} \
     && curl -L https://archive.apache.org/dist/hive/hive-standalone-metastore-${METASTORE_VERSION}/hive-standalone-metastore-${METASTORE_VERSION}-bin.tar.gz \
         | tar zxf - -C ${HIVE_HOME} --strip-components 1 \
+## copy aws jar
+    && cp ${HADOOP_HOME}/share/hadoop/tools/lib/aws-java-sdk-bundle-*.jar ${HIVE_HOME}/lib/ \
+    && cp ${HADOOP_HOME}/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar ${HIVE_HOME}/lib/  \
 ## mysql connecter and jar
     && curl -L https://dev.mysql.com/get/Downloads/Connector-J/${RDB_CONN}.tar.gz \
         | tar -zxv --strip-components 1 -C ${HIVE_HOME}/lib/ -f - ${RDB_CONN}/${RDB_CONN}.jar \
-## aws jar softlink
-    && ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/aws-java-sdk-bundle-*.jar ${HIVE_HOME}/lib/ \
-    && ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar ${HIVE_HOME}/lib/
+## remove unnecessary files
+    && rm -rf ${HADOOP_HOME}/share/doc \
+    && cd ${HADOOP_HOME}/share/hadoop \
+    && rm -rf ${UNNECESSARY} \
+    && mkdir ${UNNECESSARY}
 
 COPY entrypoint.sh .
 
