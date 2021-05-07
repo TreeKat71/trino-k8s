@@ -30,20 +30,21 @@ spec:
         - name: {{ template "metastore.fullname" . }}
           image: {{ .Values.image.registry }}{{ .Values.image.repo }}:{{ .Values.image.tag }}
           ports:
-            - containerPort: 9083
+            - name: thrift
+              containerPort: 9083
           volumeMounts:
             - name: vol-cfg-metastore
               mountPath: /opt/hive-metastore/conf/metastore-site.xml
               subPath: metastore-site.xml
           readinessProbe:
             tcpSocket:
-              port: 9083
+              port: thrift
             initialDelaySeconds: 60
             periodSeconds: 20
             timeoutSeconds: 15
           livenessProbe:
             tcpSocket:
-              port: 9083
+              port: thrift
             initialDelaySeconds: 90
             periodSeconds: 30
             timeoutSeconds: 15
