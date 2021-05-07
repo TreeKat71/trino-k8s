@@ -35,3 +35,15 @@ spec:
             - name: vol-cfg-metastore
               mountPath: /opt/hive-metastore/conf/metastore-site.xml
               subPath: metastore-site.xml
+          readinessProbe:
+            tcpSocket:
+              port: 9083
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: 9083
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 15
